@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GrokBot Agent Factory</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; font: 16px/1.45 system-ui, sans-serif; background: #10140f; color: #e7efe4; }
+    main { max-width: 760px; margin: 0 auto; padding: 28px 18px 64px; }
+    h1 { font-size: 1.7rem; margin-bottom: 0.2rem; }
+    p.lead { color: #b7c7b4; }
+    label { display: block; margin: 18px 0 6px; font-weight: 650; }
+    textarea { width: 100%; min-height: 220px; box-sizing: border-box; background: #1b241c; color: #e7efe4; border: 1px solid #314232; border-radius: 10px; padding: 12px; }
+    button { background: #d6ff4a; color: #14200a; border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700; }
+    pre { white-space: pre-wrap; background: #182018; border-radius: 10px; padding: 12px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>GrokBot Agent Factory</h1>
+    <p class="lead">Paste a rough AI agent recipe. This page fills the blank fields. Then paste the result back to Grok and say: finish it, build it, push it to GitHub.</p>
+    <label for="raw">Recipe</label>
+    <textarea id="raw" placeholder="name: Quote Follow-up&#10;one_line: Remind a daycare lead about an open cleaning quote."></textarea>
+    <div class="row">
+      <button id="fill" type="button">Fill gaps</button>
+      <button id="copy" type="button">Copy completed recipe</button>
+    </div>
+    <label for="out">Completed recipe</label>
+    <pre id="out">Waiting for a recipe.</pre>
+  </main>
+  <script src="config.js"></script>
+  <script>
+    const raw = document.getElementById("raw");
+    const out = document.getElementById("out");
+    function valueAfter(text, key) {
+      const line = text.split("\n").find((row) => row.toLowerCase().startsWith(key));
+      return line ? line.split(":").slice(1).join(":").trim() : "";
+    }
+    function fill() {
+      const text = raw.value.trim();
+      const cfg = window.GROKBOT || {};
+      const name = valueAfter(text, "name:") || "untitled-agent";
+      const one = valueAfter(text, "one_line:") || "TODO: one sentence on what this agent does.";
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "untitled-agent";
+      out.textContent = [
+        "# Agent recipe",
+        "",
+        "name: " + name,
+        "one_line: " + one,
+        "owner: " + (cfg.owner || "CreigT"),
+        "company: " + (cfg.company || "Creignificent LLC"),
+        "repo: " + slug,
+        "",
+        "## Problem",
+        "",
+        valueAfter(text, "problem:") || "TODO: what is stuck today.",
+        "",
+        "## User",
+        "",
+        "Owner of the repo. Edits config.js only.",
+        "",
+        "## Inputs",
+        "",
+        "- the recipe text",
+        "",
+        "## Outputs",
+        "",
+        "- public GitHub repo",
+        "- README, index.html, config.js",
+        "",
+        "## Allowed tools",
+        "",
+        "- write files",
+        "- create public repo under CreigT",
+        "- push to main",
+        "",
+        "## Forbidden",
+        "",
+        "- secrets in git",
+        "- paid API required for the free path",
+        "- attack, fraud, or credential theft",
+        "",
+        "## Guardrails",
+        "",
+        "- static HTML first",
+        "- public repo",
+        "- stop and ask if a paid service is required",
+        "",
+        "## Files to build",
+        "",
+        "- README.md",
+        "- index.html",
+        "- config.js",
+        "- .env.example",
+        "- .gitignore",
+        "",
+        "## Deploy",
+        "",
+        cfg.deploy || "Vercel Other, no build.",
+        "",
+        "## Done when",
+        "",
+        "- https://github.com/CreigT/" + slug + " is public",
+        "- free path opens with no key",
+        "",
+        "## Source notes",
+        "",
+        text || "(empty paste)"
+      ].join("\n");
+    }
+    document.getElementById("fill").addEventListener("click", fill);
+    document.getElementById("copy").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(out.textContent);
+    });
+  </script>
+</body>
+</html>

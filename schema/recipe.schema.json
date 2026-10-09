@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GrokBot agent recipe",
+  "type": "object",
+  "required": ["name", "one_line", "problem", "user", "inputs", "outputs", "done_when"],
+  "properties": {
+    "name": {"type": "string", "minLength": 2},
+    "one_line": {"type": "string", "minLength": 8},
+    "owner": {"type": "string", "default": "CreigT"},
+    "company": {"type": "string", "default": "Creignificent LLC"},
+    "problem": {"type": "string"},
+    "user": {"type": "string"},
+    "inputs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "outputs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "allowed_tools": {"type": "array", "items": {"type": "string"}},
+    "forbidden": {"type": "array", "items": {"type": "string"}},
+    "guardrails": {"type": "array", "items": {"type": "string"}},
+    "files": {"type": "array", "items": {"type": "string"}},
+    "deploy": {"type": "string"},
+    "done_when": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+  },
+  "additionalProperties": true
+}
